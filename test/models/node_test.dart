@@ -101,5 +101,21 @@ void main() {
       expect(node1.previous, none());
       expect(node2.next, none());
     });
+    test('Should remove node from list when connecting it to another node', () {
+      final node1 = Node.empty();
+      final node2 = Node.empty();
+      final nodeList = NodeList.fromNodes([node1]);
+
+      nodeList.add(node2);
+      expect(nodeList.nodes.length, 2);
+      expect(nodeList.nodes, containsAllInOrder([node1, node2]));
+
+      nodeList.insertNext(node1, node2);
+
+      expect(nodeList.nodes.length, 1);
+      expect(nodeList.nodes, containsAllInOrder([node1]));
+      expect(node1.next, some(node2));
+      expect(node2.previous, some(node1));
+    });
   });
 }

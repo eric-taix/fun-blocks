@@ -88,6 +88,11 @@ class NodeList {
   }
 
   void insertNext(Node target, Node node) {
+    node.previous.match(
+      () => nodes.remove(node),
+      (_) {},
+    );
+
     return target.next.match(
       () {
         target.next = some(node);
