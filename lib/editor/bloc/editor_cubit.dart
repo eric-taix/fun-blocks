@@ -12,18 +12,15 @@ class EditorCubit extends Cubit<EditorState> {
   void add(Node node, Offset position) {
     node.moveTo(position.dx, position.dy);
     state.nodes.add(node);
-    print('##### ADD: ${state.nodes.nodes.length}');
     emit(EditorChanged(state.nodes));
   }
 
   void connectInputToOutput(Node input, Node output) {
     state.nodes.insertNext(output, input);
-    print('##### CIO: ${state.nodes.nodes.length}');
     emit(EditorChanged(state.nodes));
   }
 
   void move(Node node, Offset position) {
-    print('##### MOV: ${state.nodes.nodes.length}');
     node.moveTo(position.dx, position.dy);
     emit(EditorChanged(state.nodes));
   }

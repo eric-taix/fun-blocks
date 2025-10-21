@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fp_blocky/widgets/blocks/monad_block.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:uuid/uuid.dart';
 
@@ -41,24 +40,7 @@ class Node {
 
   int get count => next.fold(() => 1, (next) => next.count + 1);
 
-  Widget get widget => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          monad.widget,
-          next.match(
-            () => SizedBox.shrink(),
-            (value) => Align(
-              alignment: Alignment.topLeft,
-              child: MonadBlock(
-                node: value,
-                onConnect: (Node targetNode, Node draggedNode) {
-                  print('Not implemented. Should it be?');
-                },
-              ),
-            ),
-          ),
-        ],
-      );
+  Widget get widget => monad.widget;
 }
 
 class NodeList {

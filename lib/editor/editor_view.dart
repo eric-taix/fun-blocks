@@ -17,7 +17,6 @@ class EditorView extends StatelessWidget {
       case MoveBlockDragData(:final node):
         context.read<EditorCubit>().move(node, position);
     }
-    ;
   }
 
   void _handleConnectToOutput(BuildContext context, Node output, Node input) {
@@ -26,18 +25,20 @@ class EditorView extends StatelessWidget {
     }
   }
 
-  List<Widget> _buildBlocksWithConnections(BuildContext context, NodeList nodes) => nodes.nodes
-      .map(
-        (node) => Positioned(
-          top: node.y,
-          left: node.x,
-          child: MonadBlock(
-            node: node,
-            onConnect: (target, dragged) => _handleConnectToOutput(context, target, dragged),
+  List<Widget> _buildBlocksWithConnections(BuildContext context, NodeList nodes) {
+    return nodes.nodes
+        .map(
+          (node) => Positioned(
+            top: node.y,
+            left: node.x,
+            child: MonadBlock(
+              node: node,
+              onConnect: (target, dragged) => _handleConnectToOutput(context, target, dragged),
+            ),
           ),
-        ),
-      )
-      .toList();
+        )
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
