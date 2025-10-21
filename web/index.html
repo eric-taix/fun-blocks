@@ -31,8 +31,129 @@
 
   <title>fp_blocky</title>
   <link rel="manifest" href="manifest.json">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+    
+    #splash-screen.fade-out {
+      opacity: 0;
+    }
+    
+    #splash-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 600px;
+      padding: 0 20px;
+    }
+    
+    #splash-logo {
+      max-width: 300px;
+      max-height: 300px;
+      width: 80%;
+      height: auto;
+      object-fit: contain;
+    }
+    
+    #splash-tagline {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333333;
+      text-align: center;
+      letter-spacing: 0.5px;
+      margin: 0;
+      margin-top: 8px;
+    }
+    
+    #splash-description {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 14px;
+      font-weight: 400;
+      color: #666666;
+      text-align: center;
+      line-height: 1.6;
+      margin: 0;
+      max-width: 500px;
+    }
+    
+    #splash-button {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 16px;
+      font-weight: 500;
+      color: #ffffff;
+      background-color: #2196F3;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 32px;
+      margin-top: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    #splash-button.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    #splash-button:hover {
+      background-color: #1976D2;
+    }
+  </style>
 </head>
 <body>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <div id="splash-content">
+      <img id="splash-logo" src="logo.jpg" alt="FP Blocky Logo">
+      <p id="splash-tagline">Snap blocks, build functions!</p>
+      <p id="splash-description">FunBlocks makes functional programming easy and fun! Snap colorful blocks together to build powerful functions—no complex syntax, just pure logic and creativity. Learn by playing, and master functional concepts visually!</p>
+      <button id="splash-button" onclick="hideSplashNow()">Start</button>
+    </div>
+  </div>
+
+  <script>
+    let flutterReady = false;
+
+    // Function to hide the splash screen
+    function hideSplashNow() {
+      if (flutterReady) {
+        const splashScreen = document.getElementById('splash-screen');
+        splashScreen.classList.add('fade-out');
+        setTimeout(() => {
+          splashScreen.style.display = 'none';
+        }, 500); // Wait for fade-out transition
+      }
+    }
+
+    // When Flutter is ready, show the button
+    window.addEventListener('flutter-first-frame', function() {
+      flutterReady = true;
+      const button = document.getElementById('splash-button');
+      button.classList.add('visible');
+    });
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
