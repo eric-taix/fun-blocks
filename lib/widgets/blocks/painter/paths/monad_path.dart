@@ -6,7 +6,7 @@ Path inputOutputPath(double width, double height, List<ConnectorType> connectors
   final connectorHeight = 8.0;
   final connectorWidth = 18.0;
   final connectorRadius = 10.0;
-  final connectorStartX = 20;
+  final connectorStartX = 14;
   final delta = 2.0;
   final radius = 8.0;
   Path path = Path()

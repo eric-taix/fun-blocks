@@ -20,16 +20,19 @@ class MonadPainter extends StatelessWidget {
     return CustomPaint(
       painter: _MonadCustomPainter(color: color, borderColor: borderColor, connectors: connectors),
       child: Padding(
-        padding: const EdgeInsets.only(top: 14, bottom: 10, left: 12, right: 12),
+        padding: const EdgeInsets.only(top: 14, bottom: 6, left: 12, right: 12),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               '$name ',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
             ),
-            ElevatedButton(onPressed: () {}, child: Text('(A a) => Option<B>')),
-            Text('', style: TextStyle(color: Colors.white)),
+            //ElevatedButton(onPressed: () {}, child: Text('(A a) => Option<B>')),
           ],
         ),
       ),

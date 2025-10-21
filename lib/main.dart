@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fp_blocky/editor/left_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'editor/bloc/editor_cubit.dart';
 import 'editor/editor_view.dart';
 
 void main() {
@@ -43,7 +45,11 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Row(
         children: [
           LeftPanel(),
-          Expanded(child: EditorView()),
+          Expanded(
+              child: BlocProvider<EditorCubit>(
+            create: (context) => EditorCubit(),
+            child: EditorView(),
+          )),
         ],
       ),
     );
