@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fp_blocky/editor/bloc/editor_cubit.dart';
 import 'package:fp_blocky/models/drag_data.dart';
 import 'package:fp_blocky/models/node.dart';
-import 'package:fp_blocky/widgets/blocks/painter/draggable_block.dart';
+import 'package:fp_blocky/widgets/blocks/draggable_block.dart';
 
 class EditorView extends StatelessWidget {
   const EditorView({super.key});
