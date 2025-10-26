@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fp_blocky/editor/bloc/editor_cubit.dart';
+import 'package:fp_blocky/widgets/buttons/mini_button.dart';
 
 class EditorTools extends StatelessWidget {
   const EditorTools({super.key});
@@ -15,13 +18,19 @@ class EditorTools extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             spacing: 20,
             children: [
-              Icon(Icons.delete),
-              Icon(Icons.copy),
-              Icon(Icons.paste),
+              MiniButton(
+                color: Colors.white,
+                onTap: () {
+                  context.read<EditorCubit>().clear();
+                },
+                child: Icon(Icons.delete),
+              ),
+              MiniButton(child: Icon(Icons.copy), onTap: () {}),
+              MiniButton(child: Icon(Icons.paste), onTap: () {}),
             ],
           ),
         ),

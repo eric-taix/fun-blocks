@@ -13,7 +13,7 @@ class DraggableBlock extends StatelessWidget {
 
   final ValueNotifier<bool> isDraggingNotifier = ValueNotifier(false);
 
-  Widget _buildNode(Node node) {
+  Widget _buildNode(Node node, bool isDragging) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -59,7 +59,9 @@ class DraggableBlock extends StatelessWidget {
                               ? Container(
                                   height: 20,
                                   decoration: BoxDecoration(
-                                    color: accepting ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                                    color: accepting
+                                        ? Colors.green.withValues(alpha: 0.3)
+                                        : Colors.red.withValues(alpha: 0.3),
                                     border: accepting
                                         ? Border.all(color: Colors.green, width: 2)
                                         : Border.all(color: Colors.red, width: 2),
@@ -80,7 +82,7 @@ class DraggableBlock extends StatelessWidget {
               ),
               node.next.match(
                 () => SizedBox.shrink(),
-                (nextNode) => _buildNode(nextNode),
+                (nextNode) => _buildNode(nextNode, isDragging),
               ),
             ],
           ),
@@ -107,7 +109,7 @@ class DraggableBlock extends StatelessWidget {
                     ? Container(
                         height: 20,
                         decoration: BoxDecoration(
-                          color: accepting ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                          color: accepting ? Colors.green.withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.3),
                           border: accepting
                               ? Border.all(color: Colors.green, width: 2)
                               : Border.all(color: Colors.red, width: 2),
@@ -133,7 +135,7 @@ class DraggableBlock extends StatelessWidget {
     return DeferredPointerHandler(
       child: ValueListenableBuilder<bool>(
         valueListenable: isDraggingNotifier,
-        builder: (BuildContext context, bool isDragging, Widget? child) => _buildNode(node),
+        builder: (BuildContext context, bool isDragging, Widget? child) => _buildNode(node, isDragging),
       ),
     );
   }
