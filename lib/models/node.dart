@@ -12,13 +12,13 @@ class Node {
   double _x = 0;
   double _y = 0;
 
-  Node(this.monad) {
-    uuid = Uuid().v4();
+  Node(this.monad, {String? uuid}) {
+    this.uuid = uuid ?? Uuid().v4();
     previous = none();
     next = none();
   }
 
-  factory Node.empty() => Node(EmptyMonad());
+  factory Node.empty({String? uuid}) => Node(EmptyMonad(), uuid: uuid);
 
   double get x => _x;
   double get y => _y;
@@ -40,12 +40,19 @@ class Node {
   @override
   int get hashCode => uuid.hashCode;
 
-  int get count => 1; //next.fold(() => 1, (next) => next.count + 1);
+  int get count => next.fold(() => 1, (next) => next.count + 1);
 
   Widget get widget => monad.widget;
 
   Node clone() {
     return Node(monad.clone(x: x, y: y));
+  }
+
+  Option<Node> findChild(Node node) {
+    return next.match(
+      () => none(),
+      (next) => next == node ? some(next) : next.findChild(node),
+    );
   }
 }
 
@@ -61,10 +68,17 @@ class NodeList {
   }
 
   void remove(Node node) {
+    node.previous.match(
+      () {},
+      (previous) {
+        previous.next = none();
+        node.previous = none();
+      },
+    );
     nodes.remove(node);
   }
 
-  void detachPrevious(Node node) {
+  void detach(Node node, Offset position) {
     node.previous.match(
       () {},
       (previous) {
@@ -73,13 +87,18 @@ class NodeList {
         nodes.add(node);
       },
     );
+    node.moveTo(position.dx, position.dy);
   }
 
   void insertAfter(Node target, Node node) {
     node.previous.match(
-      () => nodes.remove(node),
-      (_) {},
+      () {},
+      (previous) {
+        previous.next = none();
+        node.previous = none();
+      },
     );
+    nodes.remove(node);
 
     return target.next.match(
       () {
@@ -90,8 +109,9 @@ class NodeList {
       (next) {
         target.next = some(node);
         node.previous = some(target);
-        node.next = some(next);
-        next.previous = some(node);
+        final lastNode = node.last;
+        node.last.next = some(next);
+        next.previous = some(lastNode);
       },
     );
   }
@@ -101,17 +121,40 @@ class NodeList {
       () {
         target.previous = some(node.last);
         node.last.next = some(target);
-        node.previous = none();
         node.moveTo(target._x, target._y);
         nodes.remove(target);
-        nodes.insert(0, node);
+        nodes.add(node);
+        // Not always insert
+        node.previous.match(
+          () {},
+          (previous) {
+            previous.next = none();
+            node.previous = none();
+            nodes.insert(0, node);
+          },
+        );
       },
       (previous) {
+        final child = target.findChild(node);
+        if (child case Some(:final value)) {
+          final childPrevious = value.previous;
+          value.previous = none();
+          childPrevious.match(
+            () {},
+            (previous) {
+              previous.next = none();
+            },
+          );
+        }
+        if (node.previous case Some(:final value)) {
+          value.next = none();
+          node.previous = none();
+        }
         target.previous = some(node.last);
         node.last.next = some(target);
-
         node.previous = some(previous);
         previous.next = some(node);
+
         nodes.remove(node);
       },
     );

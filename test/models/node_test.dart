@@ -1,283 +1,193 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fp_blocky/models/node.dart';
-import 'package:fpdart/fpdart.dart';
+
+import 'node_tester.dart';
 
 void main() {
-  group('NodeList basic operations', () {
-    test('Should add node', () {
-      final nodeList = NodeList();
-      final node = Node.empty();
-      nodeList.add(node);
-      expect(nodeList.nodes, [node]);
+  group('Insert after', () {
+    test('Insert new node', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A']);
+      tester.insertAfter('A', 'B');
     });
-    test('Should insert a second node', () {
-      final nodeList = NodeList();
-      final node1 = Node.empty();
-      final node2 = Node.empty();
-      nodeList.add(node2);
-      nodeList.add(node1);
-      expect(nodeList.nodes, containsAllInOrder([node2, node1]));
+    test('Insert alone existing node', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A', 'B']);
+      tester.insertAfter('A', 'B');
+      tester.assertNodes(['A-B']);
     });
-    test('Should remove a node if is in the list', () {
-      final node = Node.empty();
-      final nodeList = NodeList.fromNodes([node]);
-      nodeList.remove(node);
-      expect(nodeList.nodes, []);
+    test('Insert existing linked nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A', 'B-C']);
+      tester.insertAfter('A', 'B');
+      tester.assertNodes(['A-B-C']);
     });
-    test('Should not remove a node if is not in the list', () {
-      final existingNode = Node.empty();
-      final node = Node.empty();
-      final nodeList = NodeList.fromNodes([existingNode]);
-      nodeList.remove(node);
-      expect(nodeList.nodes, [existingNode]);
+    test('Insert new node between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B']);
+      tester.insertAfter('A', 'C');
+      tester.assertNodes(['A-C-B']);
     });
-    test('Should detach a node', () {
-      final node1 = Node.empty();
-      final node2 = Node.empty();
-      final nodeList = NodeList.fromNodes([node1]);
-      nodeList.insertAfter(node1, node2);
-      expect(nodeList.nodes, containsAllInOrder([node1]));
-
-      nodeList.detachPrevious(node2);
-      expect(nodeList.nodes, containsAllInOrder([node1, node2]));
+    test('Insert existing node between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B', 'C']);
+      tester.insertAfter('A', 'C');
+      tester.assertNodes(['A-C-B']);
     });
-  });
-  group('New single node', () {
-    group('Inserted before', () {
-      test('A node w/o parent should be inserted before the node', () {
-        final node = Node.empty();
-        final nodeList = NodeList.fromNodes([node]);
-        final nodeToInsert = Node.empty();
-        nodeList.insertBefore(node, nodeToInsert);
-        expect(nodeList.nodes, containsAllInOrder([nodeToInsert]));
-        expect(nodeToInsert.previous, none());
-        expect(nodeToInsert.next, some(node));
-        expect(node.previous, some(nodeToInsert));
-        expect(node.next, none());
-      });
-      test('A child node w/ parent should be inserted before the child and after the parent', () {
-        final node1 = Node.empty();
-        final node2 = Node.empty();
-        final nodeList = NodeList.fromNodes([node1]);
-        nodeList.insertAfter(node1, node2);
-        final nodeToInsert = Node.empty();
-        nodeList.insertBefore(node2, nodeToInsert);
-        expect(nodeList.nodes, containsAllInOrder([node1]));
-        expect(node1.next, some(nodeToInsert));
-        expect(nodeToInsert.previous, some(node1));
-        expect(nodeToInsert.next, some(node2));
-        expect(node2.previous, some(nodeToInsert));
-        expect(node2.next, none());
-      });
+    test('Insert existing linked nodes between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B', 'C-D']);
+      tester.insertAfter('A', 'C');
+      tester.assertNodes(['A-C-D-B']);
     });
-    group('Inserted after', () {
-      test('A node w/o child should be inserted after the node', () {
-        final node = Node.empty();
-        final nodeList = NodeList.fromNodes([node]);
-        final nodeToInsert = Node.empty();
-        nodeList.insertAfter(node, nodeToInsert);
-        expect(nodeList.nodes, containsAllInOrder([node]));
-        expect(node.next, some(nodeToInsert));
-        expect(node.previous, none());
-        expect(nodeToInsert.previous, some(node));
-        expect(nodeToInsert.next, none());
-      });
-      test('A node w/ child should be inserted after the node but before its child', () {
-        final node1 = Node.empty();
-        final node2 = Node.empty();
-        final nodeList = NodeList.fromNodes([node1]);
-        nodeList.insertAfter(node1, node2);
-        final nodeToInsert = Node.empty();
-        nodeList.insertAfter(node1, nodeToInsert);
-        expect(nodeList.nodes, containsAllInOrder([node1]));
-        expect(node1.next, some(nodeToInsert));
-        expect(node1.previous, none());
-        expect(nodeToInsert.previous, some(node1));
-        expect(nodeToInsert.next, some(node2));
-        expect(node2.previous, some(nodeToInsert));
-        expect(node2.next, none());
-      });
+    test('Insert existing linked nodes after node by splitting', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B', 'C-D']);
+      tester.insertAfter('A', 'D');
+      tester.assertNodes(['A-D-B', 'C']);
+    });
+    test('Insert the last child between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B-C-D']);
+      tester.insertAfter('B', 'D');
+      tester.assertNodes(['A-B-D-C']);
+    });
+    test('Insert a child with children between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B-C-D-E']);
+      tester.insertAfter('B', 'D');
+      tester.assertNodes(['A-B-D-E-C']);
     });
   });
-  group('Existing single node', () {
-    group('Inserted before a node', () {
-      test('Should be removed from the list', () {
-        final node1 = Node.empty();
-        final node2 = Node.empty();
-        final nodeList = NodeList.fromNodes([node1, node2]);
-        nodeList.insertBefore(node1, node2);
-        expect(nodeList.nodes, containsAllInOrder([node2]));
-        expect(node2.previous, none());
-        expect(node2.next, some(node1));
-        expect(node1.previous, some(node2));
-        expect(node1.next, none());
-      });
+  group('Insert before', () {
+    test('Insert new node', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A']);
+      tester.insertBefore('A', 'B');
+      tester.assertNodes(['B-A']);
     });
-    group('Inserted after a node', () {
-      test('Should be removed from the list', () {
-        final node1 = Node.empty();
-        final node2 = Node.empty();
-        final nodeList = NodeList.fromNodes([node1, node2]);
-        nodeList.insertAfter(node1, node2);
-        expect(nodeList.nodes, containsAllInOrder([node1]));
-        expect(node1.next, some(node2));
-        expect(node1.previous, none());
-        expect(node2.previous, some(node1));
-        expect(node2.next, none());
-      });
+    test('Insert alone existing node', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A', 'B']);
+      tester.insertBefore('A', 'B');
+      tester.assertNodes(['B-A']);
     });
-  });
-  group('Existing linked nodes', () {
-    group('Inserted before a node w/o a parent', () {
-      test('Should insert all linked nodes before the node', () {
-        final node1 = Node.empty();
-        final node2 = Node.empty();
-        final node3 = Node.empty();
-        final nodeList = NodeList.fromNodes([node1, node2]);
-        nodeList.insertAfter(node2, node3);
-        nodeList.insertBefore(node1, node2);
-        expect(nodeList.nodes, containsAllInOrder([node2]));
-        expect(node2.previous, none());
-        expect(node2.next, some(node3));
-        expect(node3.previous, some(node2));
-        expect(node3.next, some(node1));
-        expect(node1.previous, some(node3));
-        expect(node1.next, none());
-      });
+    test('Insert existing linked nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A', 'B-C']);
+      tester.insertBefore('A', 'B');
+      tester.assertNodes(['B-C-A']);
     });
-    group('Inserted before a node w/ a parent', () {
-      test('Should insert all linked nodes before the node', () {
-        final node1 = Node.empty();
-        final node2 = Node.empty();
-        final node3 = Node.empty();
-        final node4 = Node.empty();
-        final nodeList = NodeList.fromNodes([node1, node3]);
-        nodeList.insertAfter(node1, node2);
-        nodeList.insertAfter(node3, node4);
-        nodeList.insertBefore(node2, node3);
-        expect(nodeList.nodes, containsAllInOrder([node1]));
-        expect(node1.previous, none());
-        expect(node1.next, some(node3));
-        expect(node3.previous, some(node1));
-        expect(node3.next, some(node4));
-        expect(node4.previous, some(node3));
-        expect(node4.next, some(node2));
-        expect(node2.previous, some(node4));
-        expect(node2.next, none());
-      });
+    test('Insert new node between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B']);
+      tester.insertBefore('B', 'C');
+      tester.assertNodes(['A-C-B']);
     });
-    group('Inserted after a node w/o a parent', () {
-      test('Should insert all linked nodes after the node', () {
-        final node1 = Node.empty();
-        final node2 = Node.empty();
-        final node3 = Node.empty();
-        final nodeList = NodeList.fromNodes([node1, node2]);
-        nodeList.insertAfter(node2, node3);
-        nodeList.insertAfter(node1, node2);
-
-        expect(nodeList.nodes, containsAllInOrder([node1]));
-        expect(node1.previous, none());
-        expect(node1.next, some(node2));
-        expect(node2.previous, some(node1));
-        expect(node2.next, some(node3));
-        expect(node3.previous, some(node2));
-        expect(node3.next, none());
-      });
+    test('Insert existing node between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B', 'C']);
+      tester.insertBefore('B', 'C');
+      tester.assertNodes(['A-C-B']);
     });
-    group('Inserted after a node w/ a parent', () {
-      test('Should insert all linked nodes after the node', () {});
+    test('Insert existing linked nodes between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B', 'C-D']);
+      tester.insertBefore('B', 'C');
+      tester.assertNodes(['A-C-D-B']);
+    });
+    test('Insert existing linked nodes at root', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B', 'C-D']);
+      tester.insertBefore('A', 'C');
+      tester.assertNodes(['C-D-A-B']);
+    });
+    test('Insert existing linked nodes at root by splitting', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B', 'C-D']);
+      tester.insertBefore('A', 'D');
+      tester.assertNodes(['D-A-B', 'C']);
+    });
+    test('Insert existing linked nodes before node by splitting', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B', 'C-D']);
+      tester.insertBefore('B', 'D');
+      tester.assertNodes(['A-D-B', 'C']);
+    });
+    test('Insert the last child at root', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B-C']);
+      tester.insertBefore('A', 'C');
+      tester.assertNodes(['C-A-B']);
+    });
+    test('Insert a child with children at root', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B-C-D-E']);
+      tester.insertBefore('A', 'D');
+      tester.assertNodes(['D-E-A-B-C']);
+    });
+    test('Insert a child between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B-C-D-E']);
+      tester.insertBefore('B', 'D');
+      tester.assertNodes(['A-D-E-B-C']);
+    });
+    test('Insert the last child between nodes', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B-C-D-E']);
+      tester.insertBefore('C', 'E');
+      tester.assertNodes(['A-B-E-C-D']);
     });
   });
-
-  group('Insert operations', () {
-    test('Should insert a node after another node', () {
-      final node1 = Node.empty();
-      final nodeList = NodeList.fromNodes([node1]);
-      final nodeToInsert = Node.empty();
-      nodeList.insertAfter(node1, nodeToInsert);
-      expect(nodeList.nodes, containsAllInOrder([node1]));
-      expect(node1.next, some(nodeToInsert));
-      expect(nodeToInsert.previous, some(node1));
+  group('Detach', () {
+    test('Change nothing if node is already detached', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A', 'B']);
+      tester.detach('A');
+      tester.assertNodes(['A', 'B']);
     });
-    test('Should insert a node after another node which is in a list', () {
-      final node1 = Node.empty();
-      final node2 = Node.empty();
-      final node3 = Node.empty();
-      final nodeList = NodeList.fromNodes([node1, node2, node3]);
-      final nodeToInsert = Node.empty();
-      nodeList.insertAfter(node2, nodeToInsert);
-      expect(nodeList.nodes, containsAllInOrder([node1, node2, node3]));
-      expect(node2.next, some(nodeToInsert));
-      expect(nodeToInsert.previous, some(node2));
+    test('Detach the node if it has a previous', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B']);
+      tester.detach('B');
+      tester.assertNodes(['A', 'B']);
     });
-    test('Should insert a node between two nodes', () {
-      final node2 = Node.empty();
-      final node1 = Node.empty();
-      final nodeList = NodeList.fromNodes([node1]);
-      nodeList.insertAfter(node1, node2);
-      final nodeToInsert = Node.empty();
-      nodeList.insertAfter(node1, nodeToInsert);
-      expect(nodeList.nodes, containsAllInOrder([node1]));
-      expect(node1.next, some(nodeToInsert));
-      expect(nodeToInsert.previous, some(node1));
-      expect(nodeToInsert.next, some(node2));
-      expect(node2.previous, some(nodeToInsert));
-      expect(node2.next, none());
+    test('Change nothing if node is the root', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B']);
+      tester.detach('A');
+      tester.assertNodes(['A-B']);
     });
-    test('Should insert a node before another node', () {
-      final node1 = Node.empty();
-      final nodeList = NodeList.fromNodes([node1]);
-      final nodeToInsert = Node.empty();
-      nodeList.insertBefore(node1, nodeToInsert);
-      expect(nodeList.nodes, containsAllInOrder([nodeToInsert]));
-      expect(nodeToInsert.next, some(node1));
-      expect(node1.previous, some(nodeToInsert));
+    test('Detach the node and its children if it has a previous', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B-C']);
+      tester.detach('B');
+      tester.assertNodes(['A', 'B-C']);
     });
-    test('Should insert a node before between two nodes', () {
-      final node2 = Node.empty();
-      final node1 = Node.empty();
-      final nodeList = NodeList.fromNodes([node1]);
-      nodeList.insertAfter(node1, node2);
-      final nodeToInsert = Node.empty();
-      nodeList.insertBefore(node2, nodeToInsert);
-      expect(nodeList.nodes, containsAllInOrder([node1]));
-      expect(node1.next, some(nodeToInsert));
-      expect(node1.previous, none());
-      expect(nodeToInsert.next, some(node2));
-      expect(nodeToInsert.previous, some(node1));
-      expect(node1.previous, none());
-      expect(node2.next, none());
+    test('Change nothing if the node does not exist', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A']);
+      tester.detach('B');
+      tester.assertNodes(['A']);
     });
-    test('Should insert linked nodes before another node', () {
-      final node1 = Node.empty();
-      final node2 = Node.empty();
-      final node3 = Node.empty();
-      final nodeList = NodeList.fromNodes([node1, node2]);
-      nodeList.insertAfter(node2, node3);
-      nodeList.insertBefore(node1, node2);
-      expect(nodeList.nodes, containsAllInOrder([node2]));
-      expect(node2.next, some(node3));
-      expect(node2.previous, none());
-      expect(node3.next, Some(node1));
-      expect(node3.previous, Some(node2));
-      expect(node1.next, none());
-      expect(node1.previous, Some(node3));
+  });
+  group('Remove', () {
+    test('Does nothing if the node does not exist', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A', 'B']);
+      tester.remove('C');
+      tester.assertNodes(['A', 'B']);
     });
-    test('Should remove node from list when connecting it to another node', () {
-      final node1 = Node.empty();
-      final node2 = Node.empty();
-      final nodeList = NodeList.fromNodes([node1]);
-
-      nodeList.add(node2);
-      expect(nodeList.nodes.length, 2);
-      expect(nodeList.nodes, containsAllInOrder([node1, node2]));
-
-      nodeList.insertAfter(node1, node2);
-
-      expect(nodeList.nodes.length, 1);
-      expect(nodeList.nodes, containsAllInOrder([node1]));
-      expect(node1.next, some(node2));
-      expect(node2.previous, some(node1));
+    test('Remove the node if the node exist', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A', 'B']);
+      tester.remove('B');
+      tester.assertNodes(['A']);
+    });
+    test('Remove the node and its children', () {
+      final tester = NodeTester();
+      tester.prepareNodes(['A-B-C']);
+      tester.remove('B');
+      tester.assertNodes(['A']);
     });
   });
 }

@@ -5,11 +5,12 @@ import 'package:fp_blocky/editor/widgets/menu.dart';
 import 'package:fp_blocky/models/drag_data.dart';
 import 'package:fp_blocky/models/either/either_flatmap.dart';
 import 'package:fp_blocky/models/either/either_map.dart';
+import 'package:fp_blocky/models/either/either_to_option.dart';
 import 'package:fp_blocky/models/node.dart';
 import 'package:fp_blocky/models/option/option_flatmap.dart';
 import 'package:fp_blocky/models/option/option_map.dart';
 import 'package:fp_blocky/models/option/option_of.dart';
-import 'package:fp_blocky/models/option/option_toEither.dart';
+import 'package:fp_blocky/models/option/option_to_either.dart';
 import 'package:fp_blocky/widgets/buttons/mini_button.dart';
 
 class LeftPanel extends StatefulWidget {
@@ -98,6 +99,7 @@ class _LeftPanelState extends State<LeftPanel> with SingleTickerProviderStateMix
                               children: [
                                 _buildDraggableBlock(node: Node(EitherFlatMap.prototype())),
                                 _buildDraggableBlock(node: Node(EitherMap.prototype())),
+                                _buildDraggableBlock(node: Node(EitherToOption.prototype())),
                               ],
                             ),
                           ],

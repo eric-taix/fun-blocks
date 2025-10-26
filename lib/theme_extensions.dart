@@ -14,7 +14,7 @@ class FunBlockMenuStyleExtension implements ThemeExtension<FunBlockMenuStyleExte
   ThemeExtension<FunBlockMenuStyleExtension> lerp(
       covariant ThemeExtension<FunBlockMenuStyleExtension>? other, double t) {
     if (other is! FunBlockMenuStyleExtension) {
-      return this.copyWith();
+      return copyWith();
     }
     return FunBlockMenuStyleExtension(
       textStyle: TextStyle.lerp(textStyle, other.textStyle, t)!,

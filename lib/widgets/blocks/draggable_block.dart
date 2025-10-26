@@ -13,7 +13,7 @@ class DraggableBlock extends StatelessWidget {
 
   final ValueNotifier<bool> isDraggingNotifier = ValueNotifier(false);
 
-  Widget _buildNode(Node node) {
+  Widget _buildNode(Node node, bool isDragging) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -34,50 +34,57 @@ class DraggableBlock extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              node.widget,
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  node.widget,
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: -20,
+                    child: DeferPointer(
+                      child: DragTarget<DragData>(
+                        onWillAcceptWithDetails: (details) {
+                          final accept = node.monad.outputType == details.data.node.monad.inputType;
+                          return true;
+                        },
+                        onAcceptWithDetails: (details) {
+                          final data = details.data;
+                          onConnectToOutput(node, data.node);
+                        },
+                        builder: (context, candidateData, rejectedData) {
+                          final isHovering = candidateData.isNotEmpty || rejectedData.isNotEmpty;
+                          final accepting = candidateData.isNotEmpty;
+                          return isHovering
+                              ? Container(
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: accepting
+                                        ? Colors.green.withValues(alpha: 0.3)
+                                        : Colors.red.withValues(alpha: 0.3),
+                                    border: accepting
+                                        ? Border.all(color: Colors.green, width: 2)
+                                        : Border.all(color: Colors.red, width: 2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: accepting
+                                      ? Center(
+                                          child: Icon(Icons.add, size: 16, color: Colors.green),
+                                        )
+                                      : null,
+                                )
+                              : const SizedBox(height: 20);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               node.next.match(
                 () => SizedBox.shrink(),
-                (nextNode) => _buildNode(nextNode),
+                (nextNode) => _buildNode(nextNode, isDragging),
               ),
             ],
-          ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: -20,
-          child: DeferPointer(
-            child: DragTarget<DragData>(
-              onWillAcceptWithDetails: (details) {
-                final accept = node.monad.outputType == details.data.node.monad.inputType;
-                return true;
-              },
-              onAcceptWithDetails: (details) {
-                final data = details.data;
-                onConnectToOutput(node, data.node);
-              },
-              builder: (context, candidateData, rejectedData) {
-                final isHovering = candidateData.isNotEmpty || rejectedData.isNotEmpty;
-                final accepting = candidateData.isNotEmpty;
-                return isHovering
-                    ? Container(
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: accepting ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
-                          border: accepting
-                              ? Border.all(color: Colors.green, width: 2)
-                              : Border.all(color: Colors.red, width: 2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: accepting
-                            ? Center(
-                                child: Icon(Icons.add, size: 16, color: Colors.green),
-                              )
-                            : null,
-                      )
-                    : const SizedBox(height: 20);
-              },
-            ),
           ),
         ),
         Positioned(
@@ -102,7 +109,7 @@ class DraggableBlock extends StatelessWidget {
                     ? Container(
                         height: 20,
                         decoration: BoxDecoration(
-                          color: accepting ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                          color: accepting ? Colors.green.withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.3),
                           border: accepting
                               ? Border.all(color: Colors.green, width: 2)
                               : Border.all(color: Colors.red, width: 2),
@@ -128,7 +135,7 @@ class DraggableBlock extends StatelessWidget {
     return DeferredPointerHandler(
       child: ValueListenableBuilder<bool>(
         valueListenable: isDraggingNotifier,
-        builder: (BuildContext context, bool isDragging, Widget? child) => _buildNode(node),
+        builder: (BuildContext context, bool isDragging, Widget? child) => _buildNode(node, isDragging),
       ),
     );
   }

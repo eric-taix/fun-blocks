@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fp_blocky/editor/bloc/editor_cubit.dart';
+import 'package:fp_blocky/editor/editor_info.dart';
 import 'package:fp_blocky/models/drag_data.dart';
 import 'package:fp_blocky/models/node.dart';
-import 'package:fp_blocky/widgets/blocks/painter/draggable_block.dart';
+import 'package:fp_blocky/widgets/blocks/draggable_block.dart';
 
 class EditorView extends StatelessWidget {
   const EditorView({super.key});
@@ -12,22 +13,18 @@ class EditorView extends StatelessWidget {
     switch (dragData) {
       case CreateBlockDragData(:final node):
         context.read<EditorCubit>().add(node, position);
-      //final newMonad = monad.clone(x: position.dy, y: position.dx);
-      //_monads.add(newMonad);
       case MoveBlockDragData(:final node):
         context.read<EditorCubit>().move(node, position);
     }
   }
 
   void _handleConnectToOutput(BuildContext context, Node output, Node input) {
-    print('Connecting output: $output, input: $input');
     if (output != input) {
       context.read<EditorCubit>().connectInputToOutput(input, output);
     }
   }
 
   void _handleConnectToInput(BuildContext context, Node input, Node output) {
-    print('Connecting output: $output, input: $input');
     if (output != input) {
       context.read<EditorCubit>().connectOutputToInput(output, input);
     }
@@ -67,17 +64,14 @@ class EditorView extends StatelessWidget {
                 Positioned(
                   top: 6,
                   left: 10,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.black45, width: 0.5),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Text(
-                        '$count block${count > 1 ? 's' : ''}',
+                  child: Row(
+                    children: [
+                      EditorInfo(
+                        child: Text(
+                          '$count block${count > 1 ? 's' : ''} / ${state.nodes.nodes.length} part${state.nodes.nodes.length > 1 ? 's' : ''}',
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
                 InteractiveViewer(

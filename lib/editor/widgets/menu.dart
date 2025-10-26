@@ -38,12 +38,10 @@ class _MenuState extends State<Menu> {
           ],
         ),
         if (_isExpanded)
-          ...widget.children
-              .map((e) => Padding(
-                    padding: const EdgeInsets.only(left: 18.0, bottom: 18),
-                    child: e,
-                  ))
-              .toList(),
+          ...widget.children.map((e) => Padding(
+                padding: const EdgeInsets.only(left: 18.0, bottom: 18),
+                child: e,
+              )),
       ],
     );
   }

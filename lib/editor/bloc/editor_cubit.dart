@@ -26,7 +26,18 @@ class EditorCubit extends Cubit<EditorState> {
   }
 
   void move(Node node, Offset position) {
-    node.moveTo(position.dx, position.dy);
+    node.previous.match(
+      () {
+        node.moveTo(position.dx, position.dy);
+      },
+      (_) {
+        state.nodes.detach(node, position);
+      },
+    );
     emit(EditorChanged(state.nodes));
+  }
+
+  void clear() {
+    emit(EditorEmpty());
   }
 }

@@ -50,7 +50,7 @@ class _MonadBlockState extends State<MonadBlock> {
   Widget draggableWrapper(Node node) => Stack(
         clipBehavior: Clip.none,
         children: [
-          Container(height: 20, color: Colors.red.withOpacity(0.8)),
+          Container(height: 20, color: Colors.red.withValues(alpha: 0.8)),
           Draggable<DragData>(
             data: MoveBlockDragData(node),
             onDragStarted: () => setState(() => _isDragging = true),
@@ -87,7 +87,7 @@ class _MonadBlockState extends State<MonadBlock> {
                       ? Container(
                           height: 20,
                           decoration: BoxDecoration(
-                            color: accepting ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                            color: accepting ? Colors.green.withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.3),
                             border: accepting
                                 ? Border.all(color: Colors.green, width: 2)
                                 : Border.all(color: Colors.red, width: 2),
@@ -136,51 +136,55 @@ class _MonadBlockState extends State<MonadBlock> {
   Widget build(BuildContext context) {
     if (widget.parentDragging) {
       return DeferredPointerHandler(
-        child: _buildNodeWithChildren(widget.node, (node) => Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(height: 20, color: Colors.red.withOpacity(0.8)),
-            node.widget,
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: -20,
-              child: DeferPointer(
-                child: DragTarget<DragData>(
-                  onWillAcceptWithDetails: (details) {
-                    final accept = node.monad.outputType == details.data.node.monad.inputType;
-                    return true;
-                  },
-                  onAcceptWithDetails: (details) {
-                    final data = details.data;
-                    widget.onConnect(node, data.node);
-                  },
-                  builder: (context, candidateData, rejectedData) {
-                    final isHovering = candidateData.isNotEmpty || rejectedData.isNotEmpty;
-                    final accepting = candidateData.isNotEmpty;
-                    return isHovering
-                        ? Container(
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: accepting ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
-                              border: accepting
-                                  ? Border.all(color: Colors.green, width: 2)
-                                  : Border.all(color: Colors.red, width: 2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: accepting
-                                ? Center(
-                                    child: Icon(Icons.add, size: 16, color: Colors.green),
+        child: _buildNodeWithChildren(
+            widget.node,
+            (node) => Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(height: 20, color: Colors.red.withValues(alpha: 0.8)),
+                    node.widget,
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: -20,
+                      child: DeferPointer(
+                        child: DragTarget<DragData>(
+                          onWillAcceptWithDetails: (details) {
+                            final accept = node.monad.outputType == details.data.node.monad.inputType;
+                            return true;
+                          },
+                          onAcceptWithDetails: (details) {
+                            final data = details.data;
+                            widget.onConnect(node, data.node);
+                          },
+                          builder: (context, candidateData, rejectedData) {
+                            final isHovering = candidateData.isNotEmpty || rejectedData.isNotEmpty;
+                            final accepting = candidateData.isNotEmpty;
+                            return isHovering
+                                ? Container(
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      color: accepting
+                                          ? Colors.green.withValues(alpha: 0.3)
+                                          : Colors.red.withValues(alpha: 0.3),
+                                      border: accepting
+                                          ? Border.all(color: Colors.green, width: 2)
+                                          : Border.all(color: Colors.red, width: 2),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: accepting
+                                        ? Center(
+                                            child: Icon(Icons.add, size: 16, color: Colors.green),
+                                          )
+                                        : null,
                                   )
-                                : null,
-                          )
-                        : const SizedBox(height: 20);
-                  },
-                ),
-              ),
-            ),
-          ],
-        )),
+                                : const SizedBox(height: 20);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
       );
     }
     return DeferredPointerHandler(

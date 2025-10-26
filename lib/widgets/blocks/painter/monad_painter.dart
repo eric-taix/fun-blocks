@@ -59,8 +59,8 @@ class _MonadCustomPainter extends CustomPainter {
         ..shader = ui.Gradient.linear(
           const Offset(0, 0),
           Offset(0, size.height),
-          [color.fromColor, color.toColor ?? color.fromColor],
-          [0.0, 1],
+          [color.fromColor, color.fromColor, color.toColor ?? color.fromColor],
+          [0.0, 0.1, 1],
         )
         ..style = PaintingStyle.fill,
     );
