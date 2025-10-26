@@ -1,24 +1,28 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:fp_blocky/models/block_color.dart';
 import 'package:fp_blocky/widgets/blocks/painter/paths/monad_path.dart';
 
 class MonadPainter extends StatelessWidget {
   const MonadPainter({
     required this.color,
-    required this.borderColor,
     required this.name,
     this.connectors = const [],
     super.key,
   });
 
   final String name;
-  final Color color;
-  final Color borderColor;
+  final BlockColor color;
   final List<ConnectorType> connectors;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _MonadCustomPainter(color: color, borderColor: borderColor, connectors: connectors),
+      painter: _MonadCustomPainter(
+        color: color,
+        connectors: connectors,
+      ),
       child: Padding(
         padding: const EdgeInsets.only(top: 14, bottom: 6, left: 12, right: 12),
         child: Row(
@@ -41,10 +45,9 @@ class MonadPainter extends StatelessWidget {
 }
 
 class _MonadCustomPainter extends CustomPainter {
-  _MonadCustomPainter({required this.color, required this.borderColor, required this.connectors});
+  _MonadCustomPainter({required this.color, required this.connectors});
 
-  final Color color;
-  final Color borderColor;
+  final BlockColor color;
   final List<ConnectorType> connectors;
 
   @override
@@ -53,13 +56,18 @@ class _MonadCustomPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = color
+        ..shader = ui.Gradient.linear(
+          const Offset(0, 0),
+          Offset(0, size.height),
+          [color.fromColor, color.toColor ?? color.fromColor],
+          [0.0, 1],
+        )
         ..style = PaintingStyle.fill,
     );
     canvas.drawPath(
       path,
       Paint()
-        ..color = borderColor
+        ..color = Colors.black38
         ..style = PaintingStyle.stroke,
     );
   }

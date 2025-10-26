@@ -5,6 +5,8 @@ import 'package:fp_blocky/widgets/blocks/painter/monad_painter.dart';
 import 'package:fp_blocky/widgets/blocks/painter/paths/monad_path.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 
+import 'option_colors.dart';
+
 class OptionMap extends MonadModel {
   factory OptionMap.prototype() => OptionMap._(
         inputType: fp.some('Option<String>'),
@@ -18,8 +20,7 @@ class OptionMap extends MonadModel {
 
   @override
   Widget get widget => MonadPainter(
-        color: Colors.blue.shade600,
-        borderColor: Colors.black,
+        color: OptionColors.color,
         name: 'map<C>',
         connectors: [ConnectorType.output, ConnectorType.input],
       );

@@ -5,6 +5,8 @@ import 'package:fp_blocky/widgets/blocks/painter/monad_painter.dart';
 import 'package:fp_blocky/widgets/blocks/painter/paths/monad_path.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 
+import 'option_colors.dart';
+
 class OptionOf extends MonadModel {
   OptionOf()
       : super(
@@ -22,8 +24,7 @@ class OptionOf extends MonadModel {
 
   @override
   Widget get widget => MonadPainter(
-        color: Colors.blue.shade600,
-        borderColor: Colors.blue,
+        color: OptionColors.color,
         name: 'Option.of<A>',
         connectors: [ConnectorType.output],
       );

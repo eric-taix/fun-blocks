@@ -23,6 +23,8 @@ class Node {
   double get x => _x;
   double get y => _y;
 
+  Node get last => next.fold(() => this, (next) => next.last);
+
   void moveTo(double x, double y) {
     _x = x;
     _y = y;
@@ -38,9 +40,13 @@ class Node {
   @override
   int get hashCode => uuid.hashCode;
 
-  int get count => next.fold(() => 1, (next) => next.count + 1);
+  int get count => 1; //next.fold(() => 1, (next) => next.count + 1);
 
   Widget get widget => monad.widget;
+
+  Node clone() {
+    return Node(monad.clone(x: x, y: y));
+  }
 }
 
 class NodeList {
@@ -69,7 +75,7 @@ class NodeList {
     );
   }
 
-  void insertNext(Node target, Node node) {
+  void insertAfter(Node target, Node node) {
     node.previous.match(
       () => nodes.remove(node),
       (_) {},
@@ -79,7 +85,7 @@ class NodeList {
       () {
         target.next = some(node);
         node.previous = some(target);
-        node.next = none();
+        //node.next = none();
       },
       (next) {
         target.next = some(node);
@@ -90,21 +96,23 @@ class NodeList {
     );
   }
 
-  void insertPrevious(Node target, Node node) {
+  void insertBefore(Node target, Node node) {
     return target.previous.match(
       () {
-        target.previous = some(node);
-        node.next = some(target);
+        target.previous = some(node.last);
+        node.last.next = some(target);
         node.previous = none();
+        node.moveTo(target._x, target._y);
         nodes.remove(target);
         nodes.insert(0, node);
       },
       (previous) {
-        target.previous = some(node);
-        node.next = some(target);
+        target.previous = some(node.last);
+        node.last.next = some(target);
 
         node.previous = some(previous);
         previous.next = some(node);
+        nodes.remove(node);
       },
     );
   }

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fp_blocky/editor/bloc/editor_cubit.dart';
 import 'package:fp_blocky/models/drag_data.dart';
 import 'package:fp_blocky/models/node.dart';
-import 'package:fp_blocky/widgets/blocks/monad_block.dart';
+import 'package:fp_blocky/widgets/blocks/painter/draggable_block.dart';
 
 class EditorView extends StatelessWidget {
   const EditorView({super.key});
@@ -20,8 +20,16 @@ class EditorView extends StatelessWidget {
   }
 
   void _handleConnectToOutput(BuildContext context, Node output, Node input) {
+    print('Connecting output: $output, input: $input');
     if (output != input) {
       context.read<EditorCubit>().connectInputToOutput(input, output);
+    }
+  }
+
+  void _handleConnectToInput(BuildContext context, Node input, Node output) {
+    print('Connecting output: $output, input: $input');
+    if (output != input) {
+      context.read<EditorCubit>().connectOutputToInput(output, input);
     }
   }
 
@@ -31,9 +39,10 @@ class EditorView extends StatelessWidget {
           (node) => Positioned(
             top: node.y,
             left: node.x,
-            child: MonadBlock(
+            child: DraggableBlock(
               node: node,
-              onConnect: (target, dragged) => _handleConnectToOutput(context, target, dragged),
+              onConnectToOutput: (target, dragged) => _handleConnectToOutput(context, target, dragged),
+              onConnectToInput: (target, dragged) => _handleConnectToInput(context, target, dragged),
             ),
           ),
         )

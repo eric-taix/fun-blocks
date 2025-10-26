@@ -16,7 +16,12 @@ class EditorCubit extends Cubit<EditorState> {
   }
 
   void connectInputToOutput(Node input, Node output) {
-    state.nodes.insertNext(output, input);
+    state.nodes.insertAfter(output, input);
+    emit(EditorChanged(state.nodes));
+  }
+
+  void connectOutputToInput(Node output, Node input) {
+    state.nodes.insertBefore(input, output);
     emit(EditorChanged(state.nodes));
   }
 

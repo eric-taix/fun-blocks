@@ -7,28 +7,34 @@ import 'package:fpdart/fpdart.dart' as fp;
 
 import 'option_colors.dart';
 
-class OptionFlatMap extends MonadModel {
-  factory OptionFlatMap.prototype() => OptionFlatMap._(
-        inputType: fp.some('Option<String>'),
-        outputType: fp.some('Option<String>'),
+class OptionToEither extends MonadModel {
+  OptionToEither()
+      : super(
+          inputType: fp.Some('Option<T>'),
+          outputType: fp.some('toEither<L, R>'),
+        );
+
+  factory OptionToEither.prototype() => OptionToEither._(
+        inputType: fp.Some('Option<T>'),
+        outputType: fp.some('toEither<L, R>'),
       );
 
-  OptionFlatMap._({
+  OptionToEither._({
     required super.inputType,
     required super.outputType,
   });
 
   @override
   Widget get widget => MonadPainter(
-        color: OptionColors.color,
-        name: 'flatMap<C>',
-        connectors: [ConnectorType.output, ConnectorType.input],
+        color: OptionColors.toEitherColor,
+        name: 'toEither<L, R>',
+        connectors: [ConnectorType.input, ConnectorType.output],
       );
 
   @override
   fp.Either<MonadFailure, MonadModel> connect({fp.Option<MonadModel>? output, fp.Option<MonadModel>? input}) {
     return fp.Right(
-      OptionFlatMap._(
+      OptionToEither._(
         inputType: inputType,
         outputType: outputType,
       ),
@@ -37,14 +43,9 @@ class OptionFlatMap extends MonadModel {
 
   @override
   MonadModel clone({required double x, required double y}) {
-    return OptionFlatMap._(
+    return OptionToEither._(
       inputType: inputType,
       outputType: outputType,
     );
-  }
-
-  @override
-  String toString() {
-    return 'OptionFlatMap{ inputType: $inputType, outputType: $outputType }';
   }
 }
