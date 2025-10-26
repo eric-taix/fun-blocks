@@ -1,0 +1,29 @@
+1. Use a clean code architecture where
+  - each feature is implemented in /lib/features/feature_name
+  - separate data, domain and presentation layers as sub directories
+  - data directory contains data sources and mappers and repositories implementations
+  - domain directory contains domains entities and repositories definition (no need to add use_cases except if specified)
+  - presentation directory contains flutter widgets and presentation logic
+
+2- Presentation layer
+  - Use Flutter Bloc cubit for state management and presentation logic
+  - Divide a presentation screen into multiple widgets
+    - A feature page route which provides the cubit and define the go_router page route
+    - A feature screen which defines the layout of the screen
+    - Other widgets which define semantic parts of the screen (avoid a widget with more than 100 lines of code)
+
+3- Functional Programming
+  - Use fpdart for functional programming
+  - Never use null but prefer Option<T> instead
+  - Use Either for error handling and especially TaskEither for async operations which may fail
+  - Always compose operations in multiple simple ways
+  - The cubits are responsible to run the operations at the end
+  - In state prefer to use immutable objects instead of mutable objects
+  - Always use SafeCubit instead of Cubit
+  - In state use sum types instead of product types
+  - Use sealed classes instead of enums
+  - Never use default case for switch to be exhaustive
+  - Prefer to use expressions instead of statements
+  - Use match instead of fold
+  - Use code which is exhaustive, I want the code to be bulletproof
+  - Use ternary instead of if-else
